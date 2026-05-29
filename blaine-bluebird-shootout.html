@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Annual Blaine Bluebird Shootout</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --sky: #4fa8d5;
+  --sky-light: #7ec8e3;
+  --sky-pale: #c8e8f5;
+  --sky-ultra: #e8f6fc;
+  --sky-deep: #1a6a9a;
+  --sky-dark: #0d4a72;
+  --white: #ffffff;
+  --cream: #f7fbfe;
+  --text-dark: #0d2a3d;
+  --text-mid: #2c5f7a;
+  --text-light: #6699bb;
+  --under-par: #c0392b;
+  --over-par: #1a3a4a;
+  --even-par: #2c5f7a;
+  --gold: #e8a020;
+  --gold-light: #f5c842;
+  --shadow: 0 4px 24px rgba(13,74,114,0.13);
+  --shadow-sm: 0 2px 8px rgba(13,74,114,0.10);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--sky-ultra);
+  color: var(--text-dark);
+  min-height: 100vh;
+}
+
+/* ===== HEADER ===== */
+.site-header {
+  background: linear-gradient(135deg, var(--sky-dark) 0%, var(--sky-deep) 50%, var(--sky) 100%);
+  color: var(--white);
+  text-align: center;
+  padding: 28px 20px 22px;
+  position: relative;
+  overflow: hidden;
+}
+.site-header::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
+}
+.header-bird {
+  display: block;
+  margin: 0 auto 8px;
+  filter: drop-shadow(0 3px 8px rgba(0,0,0,0.3));
+}
+.site-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.5rem, 5vw, 2.6rem);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+.header-sub {
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: var(--sky-pale);
+  margin-top: 4px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.header-date {
+  display: inline-block;
+  margin-top: 10px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 20px;
+  padding: 4px 16px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--white);
+  backdrop-filter: blur(4px);
+}
+
+/* ===== TAB NAV ===== */
+.tab-nav-wrapper {
+  background: var(--sky-dark);
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 3px 12px rgba(13,74,114,0.2);
+}
+.tab-nav {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  gap: 2px;
+  padding: 0 8px;
+}
+.tab-nav::-webkit-scrollbar { display: none; }
+.tab-btn {
+  flex-shrink: 0;
+  padding: 12px 16px 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--sky-pale);
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+.tab-btn:hover { color: var(--white); background: rgba(255,255,255,0.07); }
+.tab-btn.active {
+  color: var(--white);
+  border-bottom-color: var(--gold-light);
+  background: rgba(255,255,255,0.1);
+}
+.tab-btn .tab-score {
+  display: inline-block;
+  margin-left: 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.15);
+}
+.tab-btn.active .tab-score { background: var(--gold-light); color: var(--sky-dark); }
+
+/* ===== TAB CONTENT ===== */
+.tab-content { display: none; padding: 20px 16px 40px; max-width: 1100px; margin: 0 auto; }
+.tab-content.active { display: block; }
+
+/* ===== LEADERBOARD ===== */
+.leaderboard-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--sky-dark);
+  margin-bottom: 4px;
+}
+.leaderboard-subtitle { font-size: 0.82rem; color: var(--text-light); margin-bottom: 18px; }
+.leaderboard-wrap {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.lb-table { width: 100%; border-collapse: collapse; }
+.lb-table thead tr { background: linear-gradient(90deg, var(--sky-dark), var(--sky-deep)); color: var(--white); }
+.lb-table th {
+  padding: 12px 14px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-align: left;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.lb-table th:nth-child(3), .lb-table th:nth-child(4), .lb-table th:nth-child(5) { text-align: center; }
+.lb-table tbody tr {
+  border-bottom: 1px solid var(--sky-pale);
+  transition: background 0.15s;
+  cursor: pointer;
+}
+.lb-table tbody tr:hover { background: var(--sky-ultra); }
+.lb-table tbody tr:last-child { border-bottom: none; }
+.lb-table tbody tr.rank-1 { background: linear-gradient(90deg, rgba(232,160,32,0.08), transparent); }
+.lb-table tbody tr.rank-2 { background: linear-gradient(90deg, rgba(192,192,192,0.07), transparent); }
+.lb-table tbody tr.rank-3 { background: linear-gradient(90deg, rgba(176,102,56,0.06), transparent); }
+.lb-table td { padding: 14px 14px; font-size: 0.88rem; vertical-align: middle; }
+.lb-table td:nth-child(3), .lb-table td:nth-child(4), .lb-table td:nth-child(5) { text-align: center; }
+.rank-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 50%;
+  font-weight: 700; font-size: 0.82rem;
+  color: var(--text-light); background: var(--sky-ultra); border: 1.5px solid var(--sky-pale);
+}
+.rank-1 .rank-badge { background: #fef3d0; border-color: var(--gold); color: var(--gold); }
+.rank-2 .rank-badge { background: #f4f4f4; border-color: #bbb; color: #888; }
+.rank-3 .rank-badge { background: #fdf0ea; border-color: #c07040; color: #b06030; }
+.team-name-lb { font-weight: 600; color: var(--text-dark); font-size: 0.9rem; }
+.team-members-lb { font-size: 0.72rem; color: var(--text-light); margin-top: 2px; }
+.score-vs-par { font-weight: 700; font-size: 1.0rem; }
+.score-under { color: var(--under-par); }
+.score-over { color: var(--over-par); }
+.score-even { color: var(--even-par); }
+.thru-cell { color: var(--text-mid); font-weight: 500; }
+.strokes-cell { color: var(--text-dark); font-weight: 500; }
+
+/* ===== TEAM SCORECARD ===== */
+.team-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px; margin-bottom: 20px;
+}
+.team-title { font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 700; color: var(--sky-dark); }
+.team-members-list { font-size: 0.8rem; color: var(--text-light); margin-top: 3px; }
+.team-live-score {
+  background: var(--sky-dark); color: var(--white);
+  border-radius: var(--radius-sm); padding: 10px 18px; text-align: center; min-width: 100px;
+}
+.team-live-score .vs-par { font-family: 'Playfair Display', serif; font-size: 1.7rem; font-weight: 900; line-height: 1; }
+.team-live-score .live-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--sky-pale); margin-top: 2px; }
+.team-live-score .total-strokes { font-size: 0.78rem; color: var(--sky-light); margin-top: 1px; }
+
+.scorecard-section { margin-bottom: 20px; }
+.scorecard-section-title {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text-light); margin-bottom: 8px; padding-left: 2px;
+}
+.scorecard-grid { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; }
+
+.sc-table { width: 100%; border-collapse: collapse; }
+.sc-table thead tr { background: linear-gradient(90deg, var(--sky-dark), var(--sky-deep)); }
+.sc-table th {
+  padding: 9px 8px; font-size: 0.68rem; font-weight: 600; text-align: center;
+  color: var(--white); letter-spacing: 0.06em; text-transform: uppercase; min-width: 44px;
+}
+.sc-table th.label-col { text-align: left; min-width: 70px; }
+
+/* Par row */
+.sc-table tr.par-row td {
+  background: var(--sky-ultra); font-size: 0.82rem; color: var(--text-mid);
+  font-weight: 500; text-align: center; padding: 7px 8px; border-bottom: 2px solid var(--sky-pale);
+}
+.sc-table tr.par-row td.label-col { text-align: left; font-weight: 600; font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-light); }
+
+/* Score input row */
+.sc-table tr.score-row td { padding: 7px 4px; text-align: center; border-bottom: 1px solid var(--sky-pale); }
+.sc-table tr.score-row td.label-col { text-align: left; padding-left: 10px; font-size: 0.82rem; font-weight: 600; color: var(--text-dark); }
+
+/* VS Par row */
+.sc-table tr.vspar-row td {
+  background: var(--cream); font-size: 0.78rem; font-weight: 600;
+  text-align: center; padding: 6px 8px; border-bottom: none; color: var(--text-mid);
+}
+.sc-table tr.vspar-row td.label-col { text-align: left; font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-light); }
+
+/* Totals row */
+.sc-table tr.totals-row td {
+  background: linear-gradient(90deg, var(--sky-dark), var(--sky-deep));
+  color: var(--white); font-weight: 700; font-size: 0.9rem;
+  padding: 10px 8px; text-align: center;
+}
+.sc-table tr.totals-row td.label-col { text-align: left; padding-left: 10px; font-size: 0.75rem; letter-spacing: 0.05em; text-transform: uppercase; }
+.total-vs-par-cell { font-family: 'Playfair Display', serif; font-size: 1.1rem; }
+
+.sc-input {
+  width: 50px; height: 42px;
+  border: 1.5px solid var(--sky-pale); border-radius: 6px;
+  font-family: 'DM Sans', sans-serif; font-size: 1.0rem; font-weight: 700;
+  text-align: center; background: var(--cream); color: var(--text-dark);
+  transition: all 0.15s;
+  -moz-appearance: textfield; appearance: textfield;
+}
+.sc-input::-webkit-outer-spin-button, .sc-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+.sc-input:focus { outline: none; border-color: var(--sky); background: var(--white); box-shadow: 0 0 0 3px rgba(79,168,213,0.2); }
+.sc-input.eagle  { background: #fcd4d0; border-color: #e06060; color: #a01010; }
+.sc-input.birdie { background: #fde8e6; border-color: #e08080; color: #c02020; }
+.sc-input.par-inp { background: var(--sky-ultra); border-color: var(--sky-pale); color: var(--text-mid); }
+.sc-input.bogey  { background: #e8f4fd; border-color: var(--sky-light); color: var(--sky-deep); }
+.sc-input.double { background: #d0e8f8; border-color: var(--sky); color: var(--sky-deep); font-weight: 800; }
+.sc-input.error  { background: #ffe; border-color: #e00; animation: shake 0.3s; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+
+.vspar-cell.score-under { color: var(--under-par); font-weight: 700; }
+.vspar-cell.score-over  { color: var(--sky-deep);  font-weight: 700; }
+.vspar-cell.score-even  { color: var(--even-par);  font-weight: 600; }
+
+.grand-total-bar {
+  background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow-sm);
+  padding: 14px 18px; display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px; margin-bottom: 16px;
+}
+.grand-total-bar .label { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-light); }
+.grand-total-bar .value { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 900; }
+.grand-total-bar .value.score-under { color: var(--under-par); }
+.grand-total-bar .value.score-over  { color: var(--over-par); }
+.grand-total-bar .value.score-even  { color: var(--even-par); }
+.grand-total-bar .strokes { font-size: 0.9rem; font-weight: 600; color: var(--text-mid); margin-left: 4px; }
+
+.clear-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 18px; font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem; font-weight: 600;
+  background: transparent; border: 1.5px solid var(--sky-pale);
+  border-radius: var(--radius-sm); color: var(--text-light);
+  cursor: pointer; transition: all 0.2s;
+}
+.clear-btn:hover { border-color: #e07070; color: #c03030; background: #fff5f5; }
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(13,42,61,0.6);
+  backdrop-filter: blur(3px); z-index: 1000;
+  display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--white); border-radius: var(--radius);
+  padding: 28px 28px 24px; max-width: 360px; width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25); text-align: center;
+}
+.modal-box h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--sky-dark); margin-bottom: 8px; }
+.modal-box p { font-size: 0.86rem; color: var(--text-mid); margin-bottom: 22px; line-height: 1.5; }
+.modal-actions { display: flex; gap: 10px; justify-content: center; }
+.btn-danger { background: #c0392b; color: #fff; border: none; border-radius: var(--radius-sm); padding: 10px 22px; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 0.85rem; cursor: pointer; }
+.btn-danger:hover { background: #a93226; }
+.btn-cancel { background: var(--sky-ultra); color: var(--text-mid); border: 1.5px solid var(--sky-pale); border-radius: var(--radius-sm); padding: 10px 22px; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 0.85rem; cursor: pointer; }
+.btn-cancel:hover { background: var(--sky-pale); }
+
+@media (max-width: 600px) {
+  .tab-btn { padding: 10px 11px 8px; font-size: 0.7rem; }
+  .sc-input { width: 42px; height: 40px; font-size: 0.92rem; }
+  .lb-table th, .lb-table td { padding: 10px 9px; font-size: 0.8rem; }
+}
+
+@media print {
+  .tab-nav-wrapper, .clear-btn, .modal-overlay { display: none !important; }
+  .tab-content { display: block !important; }
+  .tab-content:not(#tab-leaderboard) { display: none !important; }
+  body { background: white; }
+  .site-header { background: var(--sky-dark) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .leaderboard-wrap { box-shadow: none; border: 1px solid #ccc; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <!-- Blue Jay SVG -->
+  <svg class="header-bird" width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Blue Jay">
+    <!-- Body -->
+    <ellipse cx="33" cy="38" rx="17" ry="13" fill="#4fa8d5"/>
+    <!-- Wing detail -->
+    <ellipse cx="33" cy="39" rx="13" ry="9" fill="#2a7ab5"/>
+    <path d="M20 36 Q28 44 46 40 Q40 48 20 44 Z" fill="#1a5a8a" opacity="0.5"/>
+    <!-- White belly -->
+    <ellipse cx="35" cy="43" rx="9" ry="7" fill="#e8f6fc"/>
+    <!-- Tail feathers -->
+    <path d="M16 40 Q10 48 8 56 Q14 50 20 48 Q15 52 14 58 Q20 52 25 50 Z" fill="#2a7ab5"/>
+    <path d="M16 40 Q12 50 10 58 Q16 51 20 49 Z" fill="#1a5a8a"/>
+    <!-- Head -->
+    <circle cx="44" cy="28" r="11" fill="#4fa8d5"/>
+    <!-- Crest -->
+    <path d="M46 17 Q48 10 44 6 Q42 12 40 15 Q38 9 36 8 Q39 14 40 17 Z" fill="#2a7ab5"/>
+    <path d="M44 17 Q45 11 43 7 Q41 13 41 17 Z" fill="#1a5a8a"/>
+    <!-- Black face mask -->
+    <path d="M33 24 Q36 20 44 20 Q50 20 53 25 Q50 30 44 31 Q38 31 33 28 Z" fill="#1a1a2e"/>
+    <path d="M33 24 Q30 26 30 30 Q32 32 35 31 Q33 28 33 24 Z" fill="#1a1a2e"/>
+    <!-- White cheek patch -->
+    <ellipse cx="44" cy="28" rx="6" ry="4" fill="#d0eaf8"/>
+    <!-- Eye -->
+    <circle cx="46" cy="25" r="2.5" fill="#1a1a2e"/>
+    <circle cx="46" cy="25" r="1.2" fill="#fff"/>
+    <circle cx="46.5" cy="24.5" r="0.5" fill="#1a1a2e"/>
+    <!-- Beak -->
+    <path d="M54 25 Q60 27 56 30 Q52 29 50 27 Z" fill="#2a2a1a"/>
+    <!-- Wing bar (white) -->
+    <path d="M22 34 Q33 31 44 33" stroke="#c8e8f5" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path d="M22 37 Q33 34 44 36" stroke="#b0d8f0" stroke-width="1" fill="none" stroke-linecap="round"/>
+    <!-- Feet -->
+    <line x1="30" y1="50" x2="27" y2="56" stroke="#e8a020" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="27" y1="56" x2="24" y2="58" stroke="#e8a020" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="27" y1="56" x2="27" y2="59" stroke="#e8a020" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="27" y1="56" x2="30" y2="59" stroke="#e8a020" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="36" y1="51" x2="33" y2="57" stroke="#e8a020" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="33" y1="57" x2="30" y2="59" stroke="#e8a020" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="33" y1="57" x2="33" y2="60" stroke="#e8a020" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="33" y1="57" x2="36" y2="60" stroke="#e8a020" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>
+  <h1>Annual Blaine Bluebird Shootout</h1>
+  <div class="header-sub">Sunset Valley Golf Club · Highland Park, Illinois</div>
+  <div class="header-date">📅 Charity Scramble · Par 72</div>
+</header>
+
+<nav class="tab-nav-wrapper">
+  <div class="tab-nav" id="tabNav"></div>
+</nav>
+
+<div class="modal-overlay" id="clearModal">
+  <div class="modal-box">
+    <h3>Clear Scores?</h3>
+    <p>This will erase all entered scores for <strong id="clearTeamName"></strong>. This cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-danger" onclick="confirmClear()">Clear Scores</button>
+    </div>
+  </div>
+</div>
+
+<main id="mainContent"></main>
+
+<script>
+/* ===== EVENT CONFIGURATION — EDIT THIS SECTION ===== */
+const CONFIG = {
+  eventName:  "Annual Blaine Bluebird Shootout",  // Event title
+  courseName: "Sunset Valley Golf Club",           // Course name
+  location:   "Highland Park, Illinois",           // Location
+  holes: 18,                                       // 9 or 18
+
+  // Par per hole — Sunset Valley Golf Club, Highland Park IL (par 72)
+  par: [4,5,4,3,4,3,5,4,4, 4,3,5,4,3,4,4,5,4],
+
+  // One entry per team. 'players' lists members shown on the scorecard.
+  teams: [
+    { name: "Spencer / Tegel / Sneddon / Roach",        players: ["Andrew Spencer","Will Tegel","Dave Sneddon","Ben Roach"],              teeTime: "1:00 PM" },
+    { name: "Buishas / Wilson / Mora / Kozera",          players: ["Dave Buishas","Bryan Wilson","Miguel Mora","Peter Kozera"],            teeTime: "1:09 PM" },
+    { name: "Koressel / Cate / Werner / Hamill",         players: ["Jacob Koressel","Steve Cate","Brock Werner","Jason Hamill"],          teeTime: "1:18 PM" },
+    { name: "Team Morinec",                              players: ["Mitch Morinec","Ticket 2","Ticket 3","Ticket 4"],                      teeTime: "1:27 PM" },
+    { name: "Griffiths / Hendricks / Spelder / Horetski",players: ["Clark Griffiths","Kyle Hendricks","Will Spelder","Chad Horetski"],    teeTime: "1:36 PM" },
+    { name: "Woods / Lantz / Gould / Warnock",           players: ["Chris Woods","Matt Lantz","Dave Gould","Jeffrey Warnock"],            teeTime: "1:45 PM" },
+    { name: "Lubesnick / Snitow / McCarthy / Corpman",   players: ["Mike Lubesnick","Alan Snitow","Paul McCarthy","Jonathan Corpman"],    teeTime: "1:54 PM" },
+    { name: "W / Cross / McCaulay / Nieman",             players: ["Ethan W","Dave Cross","Phil McCaulay","Griffin Nieman"],              teeTime: "2:03 PM" },
+    { name: "L / Rozette / Faison / Lottes",             players: ["Steve L.","Alex Rozette","Austin Faison","James Lottes"],             teeTime: "2:12 PM" },
+  ],
+
+  colors: {
+    underPar: "#c0392b",
+    overPar:  "#1a3a4a",
+    even:     "#2c5f7a"
+  }
+};
+/* ===== END CONFIGURATION ===== */
+
+
+/* ===== STORAGE ===== */
+// Data shape: { teamIndex: { holeIndex: score } }
+const STORAGE_KEY = 'golf_bluebird_shootout_v2';
+function loadScores() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; } }
+function saveScores(d) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); } catch {} }
+let allScores = loadScores();
+
+/* ===== HELPERS ===== */
+function formatVsPar(v) {
+  if (v === null || v === undefined) return '–';
+  if (v === 0) return 'E';
+  return v < 0 ? String(v) : '+' + v;
+}
+function vsParClass(v) {
+  if (v === null || v === undefined) return '';
+  return v < 0 ? 'score-under' : v > 0 ? 'score-over' : 'score-even';
+}
+function inputClass(score, par) {
+  if (!score) return '';
+  const d = score - par;
+  if (d <= -2) return 'eagle';
+  if (d === -1) return 'birdie';
+  if (d === 0)  return 'par-inp';
+  if (d === 1)  return 'bogey';
+  return 'double';
+}
+function vsParLabel(score, par) {
+  if (!score) return '';
+  const d = score - par;
+  if (d === 0) return 'E';
+  return d < 0 ? String(d) : '+' + d;
+}
+
+/* ===== LEADERBOARD DATA ===== */
+function getTeamData(ti) {
+  const scores = allScores[ti] || {};
+  let totalStrokes = 0, holesCompleted = 0;
+  for (let h = 0; h < CONFIG.holes; h++) {
+    const s = scores[h];
+    if (s && s > 0) { totalStrokes += s; holesCompleted++; }
+  }
+  const parThru = CONFIG.par.slice(0, holesCompleted).reduce((a,b)=>a+b, 0);
+  const vsPar   = holesCompleted > 0 ? totalStrokes - parThru : null;
+  const thru    = holesCompleted === 0 ? '–' : holesCompleted === CONFIG.holes ? 'F' : String(holesCompleted);
+  return { vsPar, thru, holesCompleted, totalStrokes: holesCompleted > 0 ? totalStrokes : null };
+}
+
+/* ===== BUILD UI ===== */
+function buildUI() {
+  const nav  = document.getElementById('tabNav');
+  const main = document.getElementById('mainContent');
+  nav.innerHTML = main.innerHTML = '';
+
+  // Leaderboard tab
+  const lbBtn = document.createElement('button');
+  lbBtn.className = 'tab-btn active';
+  lbBtn.id = 'tabBtn-leaderboard';
+  lbBtn.innerHTML = '🏆 Leaderboard';
+  lbBtn.onclick = () => showTab('leaderboard');
+  nav.appendChild(lbBtn);
+
+  const lbDiv = document.createElement('div');
+  lbDiv.className = 'tab-content active';
+  lbDiv.id = 'tab-leaderboard';
+  lbDiv.innerHTML = buildLeaderboardHTML();
+  main.appendChild(lbDiv);
+
+  // Team tabs
+  CONFIG.teams.forEach((team, ti) => {
+    const data = getTeamData(ti);
+    const scoreStr = data.vsPar !== null ? formatVsPar(data.vsPar) : '–';
+    const shortName = team.name.split('/')[0].trim();
+
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn';
+    btn.id = `tabBtn-team${ti}`;
+    btn.innerHTML = `${shortName} <span class="tab-score">${scoreStr}</span>`;
+    btn.onclick = () => showTab('team' + ti);
+    nav.appendChild(btn);
+
+    const teamDiv = document.createElement('div');
+    teamDiv.className = 'tab-content';
+    teamDiv.id = `tab-team${ti}`;
+    teamDiv.innerHTML = buildTeamHTML(ti);
+    main.appendChild(teamDiv);
+  });
+}
+
+/* ===== LEADERBOARD HTML ===== */
+function buildLeaderboardHTML() {
+  const teams = CONFIG.teams.map((t, i) => ({ ...getTeamData(i), name: t.name, players: t.players, index: i }));
+  teams.sort((a, b) => {
+    const av = a.vsPar === null ? 999 : a.vsPar;
+    const bv = b.vsPar === null ? 999 : b.vsPar;
+    return av !== bv ? av - bv : a.name.localeCompare(b.name);
+  });
+
+  let rank = 1;
+  for (let i = 0; i < teams.length; i++) {
+    if (teams[i].vsPar === null) { teams[i].rankStr = '–'; teams[i].rankNum = 999; continue; }
+    if (i > 0 && teams[i].vsPar === teams[i-1].vsPar && teams[i-1].vsPar !== null) {
+      teams[i].rankStr = teams[i-1].rankStr = 'T' + rank;
+    } else {
+      rank = i + 1;
+      teams[i].rankStr = String(rank);
+    }
+    teams[i].rankNum = rank;
+  }
+
+  const rows = teams.map(t => {
+    const rc    = t.rankNum <= 3 ? `rank-${t.rankNum}` : '';
+    const vsStr = formatVsPar(t.vsPar);
+    const vsCls = vsParClass(t.vsPar);
+    const str   = t.totalStrokes !== null ? t.totalStrokes : '–';
+    return `<tr class="${rc}" onclick="showTab('team${t.index}')">
+      <td><span class="rank-badge">${t.rankStr}</span></td>
+      <td>
+        <div class="team-name-lb">${t.name}</div>
+        <div class="team-members-lb">${t.players.join(' · ')}</div>
+      </td>
+      <td><span class="score-vs-par ${vsCls}">${vsStr}</span></td>
+      <td class="thru-cell">${t.thru}</td>
+      <td class="strokes-cell">${str}</td>
+    </tr>`;
+  }).join('');
+
+  return `
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:6px">
+      <div>
+        <div class="leaderboard-title">🏆 Live Leaderboard</div>
+        <div class="leaderboard-subtitle">Tap any team row to enter scores · Leaderboard updates in real time</div>
+      </div>
+    </div>
+    <div class="leaderboard-wrap">
+      <table class="lb-table">
+        <thead><tr>
+          <th style="width:44px">Pos</th>
+          <th>Team</th>
+          <th>Score</th>
+          <th>Thru</th>
+          <th>Strokes</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div style="margin-top:14px;font-size:0.74rem;color:var(--text-light);line-height:1.6;">
+      ⚠️ <strong>Note:</strong> Scores are saved per device and do not sync automatically across phones.
+    </div>`;
+}
+
+/* ===== TEAM HTML ===== */
+function buildTeamHTML(ti) {
+  const team = CONFIG.teams[ti];
+  const data = getTeamData(ti);
+  const vsParStr = formatVsPar(data.vsPar);
+  const vsParCls = vsParClass(data.vsPar);
+
+  const front9 = CONFIG.par.slice(0, 9);
+  const back9  = CONFIG.par.slice(9, 18);
+
+  function buildHalf(startHole, pars, label) {
+    const holeNums = pars.map((_, i) => startHole + i);        // 1-based hole numbers
+    const holeIdxs = pars.map((_, i) => startHole - 1 + i);   // 0-based indexes into allScores
+
+    const scores = allScores[ti] || {};
+    const parSum  = pars.reduce((a,b)=>a+b,0);
+    let halfStrokes = 0, halfVsPar = 0;
+
+    const headerCells = holeNums.map(n => `<th>${n}</th>`).join('');
+    const parCells    = pars.map(p => `<td>${p}</td>`).join('');
+
+    // One score input per hole
+    const scoreCells = holeIdxs.map((hi, i) => {
+      const val = scores[hi] || '';
+      const cls = val ? inputClass(val, pars[i]) : '';
+      if (val) { halfStrokes += val; halfVsPar += val - pars[i]; }
+      return `<td><input type="number" class="sc-input ${cls}"
+        data-team="${ti}" data-hole="${hi}"
+        value="${val}" min="1" max="20"
+        oninput="handleScoreInput(this)"
+        onkeydown="handleKeyNav(event,this)" /></td>`;
+    }).join('');
+
+    // Per-hole vs-par cells (shown under score row)
+    const vsparCells = holeIdxs.map((hi, i) => {
+      const val = scores[hi];
+      if (!val) return `<td class="vspar-cell"></td>`;
+      const d = val - pars[i];
+      const label = d === 0 ? 'E' : d < 0 ? String(d) : '+'+d;
+      const cls   = d < 0 ? 'score-under' : d > 0 ? 'score-over' : 'score-even';
+      return `<td class="vspar-cell ${cls}" id="vp-${ti}-${hi}">${label}</td>`;
+    }).join('');
+
+    const totStr   = halfStrokes > 0 ? halfStrokes : '';
+    const vsHalfStr = halfStrokes > 0
+      ? `<span class="${vsParClass(halfVsPar)}">${formatVsPar(halfVsPar)}</span>` : '–';
+
+    return `
+      <div class="scorecard-section">
+        <div class="scorecard-section-title">${label}</div>
+        <div class="scorecard-grid">
+          <table class="sc-table" id="sc-${ti}-${startHole === 1 ? 'front' : 'back'}">
+            <thead><tr>
+              <th class="label-col">Hole</th>${headerCells}
+              <th>Total</th><th>Score</th>
+            </tr></thead>
+            <tbody>
+              <tr class="par-row">
+                <td class="label-col">Par</td>${parCells}
+                <td>${parSum}</td><td>–</td>
+              </tr>
+              <tr class="score-row">
+                <td class="label-col">Team Score</td>${scoreCells}
+                <td id="halftot-${ti}-${startHole === 1 ? 'front' : 'back'}" style="font-weight:700">${totStr}</td>
+                <td id="halfvp-${ti}-${startHole === 1 ? 'front' : 'back'}" style="font-weight:700">${vsHalfStr}</td>
+              </tr>
+              <tr class="vspar-row">
+                <td class="label-col">vs Par</td>${vsparCells}
+                <td></td><td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+  }
+
+  return `
+    <div class="team-header">
+      <div>
+        <div class="team-title">${team.name}</div>
+        <div class="team-members-list">⏰ ${team.teeTime} &nbsp;·&nbsp; ${team.players.join(' · ')}</div>
+      </div>
+      <div class="team-live-score" id="liveScore-${ti}">
+        <div class="vs-par ${vsParCls}">${vsParStr}</div>
+        <div class="live-label">vs Par</div>
+        <div class="total-strokes">${data.totalStrokes !== null ? data.totalStrokes + ' strokes' : 'No scores yet'}</div>
+      </div>
+    </div>
+
+    ${buildHalf(1,  front9, 'Front Nine — Holes 1–9')}
+    ${buildHalf(10, back9,  'Back Nine — Holes 10–18')}
+
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:4px">
+      <div class="grand-total-bar" style="flex:1;min-width:200px">
+        <div>
+          <div class="label">Total vs Par</div>
+          <div>
+            <span class="value ${vsParCls}" id="grandVsPar-${ti}">${vsParStr}</span>
+            <span class="strokes" id="grandStrokes-${ti}">${data.totalStrokes !== null ? '('+data.totalStrokes+' strokes)' : ''}</span>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div class="label" style="margin-bottom:4px">Thru</div>
+          <div style="font-size:1.2rem;font-weight:700;color:var(--sky-deep)" id="grandThru-${ti}">${data.thru}</div>
+        </div>
+      </div>
+      <button class="clear-btn" onclick="openClearModal(${ti})">🗑 Clear Scores</button>
+    </div>
+    <div style="font-size:0.72rem;color:var(--text-light);margin-top:8px">
+      Enter your team's scramble score for each hole. Scores save automatically as you type.
+    </div>`;
+}
+
+/* ===== TAB SWITCHING ===== */
+function showTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  const content = document.getElementById('tab-' + tabId);
+  const btn     = document.getElementById('tabBtn-' + tabId);
+  if (content) content.classList.add('active');
+  if (btn) { btn.classList.add('active'); btn.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' }); }
+}
+
+/* ===== SCORE INPUT ===== */
+function handleScoreInput(input) {
+  const ti  = parseInt(input.dataset.team);
+  const hi  = parseInt(input.dataset.hole);
+  const raw = input.value.trim();
+
+  input.classList.remove('error');
+
+  if (raw === '') {
+    if (allScores[ti]) delete allScores[ti][hi];
+    input.className = 'sc-input';
+    saveScores(allScores);
+    refreshTeamDisplays(ti, hi);
+    return;
+  }
+
+  const val = parseInt(raw);
+  if (isNaN(val) || val < 1 || val > 20) {
+    input.classList.add('error');
+    setTimeout(() => input.classList.remove('error'), 500);
+    return;
+  }
+
+  if (!allScores[ti]) allScores[ti] = {};
+  allScores[ti][hi] = val;
+  saveScores(allScores);
+
+  // Style the input
+  input.className = 'sc-input ' + inputClass(val, CONFIG.par[hi]);
+  refreshTeamDisplays(ti, hi);
+}
+
+function handleKeyNav(e, input) {
+  if (e.key === 'ArrowRight') { e.preventDefault(); focusNext(input, 1); }
+  if (e.key === 'ArrowLeft')  { e.preventDefault(); focusNext(input, -1); }
+}
+function focusNext(input, dir) {
+  const all = Array.from(document.querySelectorAll(`#tab-team${input.dataset.team} .sc-input`));
+  const next = all[all.indexOf(input) + dir];
+  if (next) next.focus();
+}
+
+/* ===== REFRESH DISPLAYS ===== */
+function refreshTeamDisplays(ti, changedHole) {
+  const data    = getTeamData(ti);
+  const vsStr   = formatVsPar(data.vsPar);
+  const vsCls   = vsParClass(data.vsPar);
+  const scores  = allScores[ti] || {};
+
+  // Update the changed hole's vs-par cell
+  if (changedHole !== undefined) {
+    const cell = document.getElementById(`vp-${ti}-${changedHole}`);
+    if (cell) {
+      const val = scores[changedHole];
+      if (val) {
+        const d = val - CONFIG.par[changedHole];
+        cell.textContent = d === 0 ? 'E' : d < 0 ? String(d) : '+'+d;
+        cell.className   = `vspar-cell ${vsParClass(d)}`;
+      } else {
+        cell.textContent = '';
+        cell.className   = 'vspar-cell';
+      }
+    }
+  }
+
+  // Update half totals
+  ['front','back'].forEach(half => {
+    const start = half === 'front' ? 0 : 9;
+    let s = 0, vp = 0;
+    for (let h = start; h < start + 9; h++) {
+      const sc = scores[h];
+      if (sc) { s += sc; vp += sc - CONFIG.par[h]; }
+    }
+    const totEl = document.getElementById(`halftot-${ti}-${half}`);
+    const vpEl  = document.getElementById(`halfvp-${ti}-${half}`);
+    if (totEl) totEl.textContent = s > 0 ? s : '';
+    if (vpEl)  vpEl.innerHTML    = s > 0 ? `<span class="${vsParClass(vp)}">${formatVsPar(vp)}</span>` : '–';
+  });
+
+  // Live score widget
+  const ls = document.getElementById('liveScore-' + ti);
+  if (ls) {
+    ls.querySelector('.vs-par').textContent = vsStr;
+    ls.querySelector('.vs-par').className   = 'vs-par ' + vsCls;
+    ls.querySelector('.total-strokes').textContent = data.totalStrokes !== null ? data.totalStrokes + ' strokes' : 'No scores yet';
+  }
+
+  // Grand total bar
+  const gvp = document.getElementById('grandVsPar-' + ti);
+  const gst = document.getElementById('grandStrokes-' + ti);
+  const gth = document.getElementById('grandThru-' + ti);
+  if (gvp) { gvp.textContent = vsStr; gvp.className = 'value ' + vsCls; }
+  if (gst) gst.textContent = data.totalStrokes !== null ? '('+data.totalStrokes+' strokes)' : '';
+  if (gth) gth.textContent = data.thru;
+
+  // Tab button score badge
+  const btn = document.getElementById('tabBtn-team' + ti);
+  if (btn) { const sp = btn.querySelector('.tab-score'); if (sp) sp.textContent = data.vsPar !== null ? vsStr : '–'; }
+
+  // Refresh leaderboard
+  const lb = document.getElementById('tab-leaderboard');
+  if (lb) lb.innerHTML = buildLeaderboardHTML();
+}
+
+/* ===== CLEAR MODAL ===== */
+let pendingClearTeam = null;
+function openClearModal(ti) {
+  pendingClearTeam = ti;
+  document.getElementById('clearTeamName').textContent = CONFIG.teams[ti].name;
+  document.getElementById('clearModal').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('clearModal').classList.remove('open');
+  pendingClearTeam = null;
+}
+function confirmClear() {
+  if (pendingClearTeam !== null) {
+    delete allScores[pendingClearTeam];
+    saveScores(allScores);
+    const div = document.getElementById('tab-team' + pendingClearTeam);
+    if (div) div.innerHTML = buildTeamHTML(pendingClearTeam);
+    refreshTeamDisplays(pendingClearTeam);
+  }
+  closeModal();
+}
+document.getElementById('clearModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+/* ===== INIT ===== */
+buildUI();
+</script>
+</body>
+</html>
